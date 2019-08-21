@@ -1,12 +1,20 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import Home from './views/Home.vue'
+import Vue from 'vue';
+import Router from 'vue-router';
+import Home from './views/Home.vue';
 
-Vue.use(Router)
+Vue.use(Router);
 
-export default new Router({
+const title = document.title;
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { x: 0, y: 0 };
+    }
+  },
   routes: [
     {
       path: '/',
@@ -14,12 +22,39 @@ export default new Router({
       component: Home
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+      path: '/impressum',
+      name: 'Impressum',
+      meta: {
+        title: 'Impressum'
+      },
+      component: () => import('./views/Impressum.vue')
+    },
+    {
+      path: '/datenschutzerklaerung',
+      name: 'Datenschutzerklärung',
+      meta: {
+        title: 'Datenschutzerklärung'
+      },
+      component: () => import('./views/Datenschutzerklaerung.vue')
+    },
+    {
+      path: '*',
+      name: 'not found',
+      meta: {
+        title: '404'
+      },
+      component: () => import('./views/NotFound.vue')
     }
   ]
-})
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.title) {
+    document.title = title + ' – ' + to.meta.title;
+  } else {
+    document.title = title;
+  }
+  next();
+});
+
+export default router;
